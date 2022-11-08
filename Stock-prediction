@@ -1,0 +1,33 @@
+from bs4 import BeautifulSoup
+from datetime import datetime #현재시각을 출력 
+import requests #url 의 정보를 받아 오기 위한 requests 를 import 합니다.
+import time # 1분마다 주가 정보를 받을 수 있게 시간 측정을 위한 time 을 import 합니다. 
+
+def get_code(company_code): #종목 코드를 입력 받아 해당 종목 코드를 검색한 네이버 검색 페이지의 html 코드를 parser 한 결과 값을 리턴해 주는 함수
+    url = "https://finance.naver.com/item/main.nhn?code=" + company_code
+    result = requests.get(url)
+    bs_obj = BeautifulSoup(result.content, "html.parser")
+    return bs_obj
+
+def get_price(company_code): # html.parser 함 첫 번째 함수 결과 값을 바탕으로 해당 종목 코드의 현재 가격을 가져오는 함수
+    bs_obj = get_code(company_code)
+    no_today = bs_obj.find("p", {"class": "no_today"})
+    blind = no_today.find("span", {"class": "blind"})
+    now_price = blind.text
+    return now_price
+
+company_codes = ["271980", "042510", "014285", "042040"] #company_codes 배열에 출력하고자 하는 종목코드를 넣는다. 1개든 2개든.. 원하는 종목 코드를 모두 넣는다. 
+
+while True: # While문의 참 값을 True 로 주었기 때문에 무한루프가 돌게 되는 것
+    now = datetime.now()
+    print (now)
+    
+    for item in company_codes:
+        now_price = get_price(item)
+        print(now_price)
+    print("-------------------------------")
+    print("test")
+    time.sleep(600) #60초 후에 다시 while문이 반복. 해당 반복문의 종료는 프로그램 종료
+
+
+    
